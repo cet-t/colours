@@ -72,12 +72,16 @@ pub(crate) use impl_colour_value_trait;
 
 macro_rules! impl_rgb_methods {
     ($($t:ty),+ $(,)?) => {
-        $(::pastey::paste! {
+        $(
             impl std::ops::Add for Rgb<$t> {
                 type Output = Self;
 
                 fn add(self, rhs: Self) -> Self::Output {
-                    Self(self.0 + rhs.0, self.1 + rhs.1, self.2 + rhs.2)
+                    Self {
+                        r: self.r + rhs.r,
+                        g: self.g + rhs.g,
+                        b: self.b + rhs.b,
+                    }
                 }
             }
 
@@ -85,7 +89,11 @@ macro_rules! impl_rgb_methods {
                 type Output = Self;
 
                 fn sub(self, rhs: Self) -> Self::Output {
-                    Self(self.0 - rhs.0, self.1 - rhs.1, self.2 - rhs.2)
+                    Self {
+                        r: self.r - rhs.r,
+                        g: self.g - rhs.g,
+                        b: self.b - rhs.b,
+                    }
                 }
             }
 
@@ -93,10 +101,14 @@ macro_rules! impl_rgb_methods {
                 type Output = Self;
 
                 fn mul(self, rhs: Self) -> Self::Output {
-                    Self(self.0 * rhs.0, self.1 * rhs.1, self.2 * rhs.2)
+                    Self {
+                        r: self.r * rhs.r,
+                        g: self.g * rhs.g,
+                        b: self.b * rhs.b,
+                    }
                 }
             }
-        })+
+        )+
     };
 }
 pub(crate) use impl_rgb_methods;
@@ -108,7 +120,7 @@ macro_rules! impl_rgb_neg {
                 type Output = Self;
 
                 fn neg(self) -> Self::Output {
-                    Self(0xff, 0xff, 0xff) - self
+                    Self::black() - self
                 }
             }
         })+
@@ -119,7 +131,7 @@ macro_rules! impl_rgb_neg {
                 type Output = Self;
 
                 fn neg(self) -> Self::Output {
-                    Self(1.0, 1.0, 1.0) - self
+                    Self::black() - self
                 }
             }
         })+
@@ -132,14 +144,6 @@ macro_rules! impl_colour_trait {
         $(::pastey::paste! {
             impl<T: ColourValue> Colour for $t<T> {
                 type Word = T;
-
-                // fn as_slice(self) -> [Self::Word; 3] {
-                //     [self.0, self.1, self.2]
-                // }
-
-                // fn as_tuple(self) -> (Self::Word, Self::Word, Self::Word) {
-                //     (self.0, self.1, self.2)
-                // }
             }
         })+
     };
@@ -154,9 +158,9 @@ macro_rules! impl_rgb_to_hsv {
                     const MAX_VAL: f64 = [<u $bits>]::MAX as f64;
                     const UNIT: f64 = MAX_VAL / 6.0;
 
-                    let r = self.0 as f64;
-                    let g = self.1 as f64;
-                    let b = self.2 as f64;
+                    let r = self.r as f64;
+                    let g = self.g as f64;
+                    let b = self.b as f64;
 
                     let c_max = r.max(g.max(b));
                     let c_min = r.min(g.min(b));
@@ -185,9 +189,9 @@ macro_rules! impl_rgb_to_hsv {
                 fn into(self) -> Hsv<[<f $bits>]> {
                     const UNIT: f64 = 1.0 / 6.0;
 
-                    let r = self.0 as f64;
-                    let g = self.1 as f64;
-                    let b = self.2 as f64;
+                    let r = self.r as f64;
+                    let g = self.g as f64;
+                    let b = self.b as f64;
 
                     let c_max = r.max(g.max(b));
                     let c_min = r.min(g.min(b));
@@ -220,9 +224,9 @@ macro_rules! impl_hsv_to_rgb {
                 fn into(self) -> Rgb<[<u $bits>]> {
                     const MAX_VAL: f64 = [<u $bits>]::MAX as f64;
 
-                    let h = self.0 as f64 / MAX_VAL;
-                    let s = self.1 as f64 / MAX_VAL;
-                    let v = self.2 as f64 / MAX_VAL;
+                    let h = self.h as f64 / MAX_VAL;
+                    let s = self.s as f64 / MAX_VAL;
+                    let v = self.v as f64 / MAX_VAL;
 
                     let h6 = h * 6.0;
                     let c = v * s;
@@ -251,9 +255,9 @@ macro_rules! impl_hsv_to_rgb {
         $(::pastey::paste! {
             impl Into<Rgb<[<f $bits>]>> for Hsv<[<f $bits>]> {
                 fn into(self) -> Rgb<[<f $bits>]> {
-                    let h = self.0 as f64;
-                    let s = self.1 as f64;
-                    let v = self.2 as f64;
+                    let h = self.h as f64;
+                    let s = self.s as f64;
+                    let v = self.v as f64;
 
                     let h6 = h * 6.0;
                     let c = v * s;
@@ -281,13 +285,13 @@ macro_rules! impl_rgb_cast {
     ($from:ty, $to:ty) => {
         impl RgbCast<$to> for Rgb<$from> {
             fn cast(self) -> Rgb<$to> {
-                Rgb::new(self.0 as $to, self.1 as $to, self.2 as $to)
+                Rgb::new(self.r as $to, self.g as $to, self.b as $to)
             }
         }
 
         impl HsvCast<$to> for Hsv<$from> {
             fn cast(self) -> Hsv<$to> {
-                Hsv::new(self.0 as $to, self.1 as $to, self.2 as $to)
+                Hsv::new(self.h as $to, self.s as $to, self.v as $to)
             }
         }
     };
@@ -299,14 +303,14 @@ macro_rules! impl_rgb_cast_f_to_u {
         impl RgbCast<$u> for Rgb<$f> {
             fn cast(self) -> Rgb<$u> {
                 let to_u = |x| (x * 255.0) as $u;
-                Rgb::new(to_u(self.0), to_u(self.1), to_u(self.2))
+                Rgb::new(to_u(self.r), to_u(self.g), to_u(self.b))
             }
         }
 
         impl HsvCast<$u> for Hsv<$f> {
             fn cast(self) -> Hsv<$u> {
                 let to_u = |x| (x * 255.0) as $u;
-                Hsv::new(to_u(self.0), to_u(self.1), to_u(self.2))
+                Hsv::new(to_u(self.h), to_u(self.s), to_u(self.v))
             }
         }
     };
@@ -318,14 +322,14 @@ macro_rules! impl_rgb_cast_u_to_f {
         impl RgbCast<$f> for Rgb<$u> {
             fn cast(self) -> Rgb<$f> {
                 let to_f = |x| (x as $f) / 255.0;
-                Rgb::new(to_f(self.0), to_f(self.1), to_f(self.2))
+                Rgb::new(to_f(self.r), to_f(self.g), to_f(self.b))
             }
         }
 
         impl HsvCast<$f> for Hsv<$u> {
             fn cast(self) -> Hsv<$f> {
                 let to_f = |x| (x as $f) / 255.0;
-                Hsv::new(to_f(self.0), to_f(self.1), to_f(self.2))
+                Hsv::new(to_f(self.h), to_f(self.s), to_f(self.v))
             }
         }
     };

@@ -4,9 +4,9 @@ impl<T: ColourValue> serde::Serialize for Rgb<T> {
     fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
         use serde::ser::SerializeStruct;
         let mut state = serializer.serialize_struct("Rgb", 3)?;
-        state.serialize_field("r", &self.0)?;
-        state.serialize_field("g", &self.1)?;
-        state.serialize_field("b", &self.2)?;
+        state.serialize_field("r", &self.r)?;
+        state.serialize_field("g", &self.g)?;
+        state.serialize_field("b", &self.b)?;
         state.end()
     }
 }
@@ -21,7 +21,11 @@ impl<'de, T: ColourValue> serde::Deserialize<'de> for Rgb<T> {
             b: T,
         }
         let helper = RgbHelper::<T>::deserialize(deserializer)?;
-        Ok(Rgb(helper.r, helper.g, helper.b))
+        Ok(Rgb {
+            r: helper.r,
+            g: helper.g,
+            b: helper.b,
+        })
     }
 }
 
@@ -29,9 +33,9 @@ impl<T: ColourValue> serde::Serialize for Hsv<T> {
     fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
         use serde::ser::SerializeStruct;
         let mut state = serializer.serialize_struct("Hsv", 3)?;
-        state.serialize_field("h", &self.0)?;
-        state.serialize_field("s", &self.1)?;
-        state.serialize_field("v", &self.2)?;
+        state.serialize_field("h", &self.h)?;
+        state.serialize_field("s", &self.s)?;
+        state.serialize_field("v", &self.v)?;
         state.end()
     }
 }
@@ -46,7 +50,11 @@ impl<'de, T: ColourValue> serde::Deserialize<'de> for Hsv<T> {
             v: T,
         }
         let helper = HsvHelper::<T>::deserialize(deserializer)?;
-        Ok(Hsv(helper.h, helper.s, helper.v))
+        Ok(Hsv {
+            h: helper.h,
+            s: helper.s,
+            v: helper.v,
+        })
     }
 }
 

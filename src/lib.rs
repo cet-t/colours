@@ -10,7 +10,7 @@ mod tests;
 
 pub(crate) use internal::*;
 
-pub use crate::cast::*;
-pub use crate::colour::{Colour, ColourValue};
+pub use crate::cast::{HsvCast, RgbCast};
+pub use crate::colour::ColourValue;
 pub use crate::hsv::Hsv;
 pub use crate::rgb::Rgb;

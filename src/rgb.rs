@@ -1,75 +1,111 @@
 use crate::ColourValue;
 
 #[derive(Debug, Clone, Copy, Default, PartialEq)]
-pub struct Rgb<T: ColourValue>(pub(crate) T, pub(crate) T, pub(crate) T);
+pub struct Rgb<T: ColourValue> {
+    pub(crate) r: T,
+    pub(crate) g: T,
+    pub(crate) b: T,
+}
 
 impl<T: ColourValue<Work = T>> Rgb<T> {
     pub fn new(r: T, g: T, b: T) -> Self {
-        Self(r.clamp(), g.clamp(), b.clamp())
-    }
-
-    pub const fn r(self) -> T {
-        self.0
-    }
-
-    pub const fn g(self) -> T {
-        self.1
-    }
-
-    pub const fn b(self) -> T {
-        self.2
+        Self {
+            r: r.clamp(),
+            g: g.clamp(),
+            b: b.clamp(),
+        }
     }
 
     pub const fn with_red(self, r: T) -> Self {
-        Self(r, self.1, self.2)
+        Self {
+            r,
+            g: self.g,
+            b: self.b,
+        }
     }
 
     pub const fn with_green(self, g: T) -> Self {
-        Self(self.0, g, self.2)
+        Self {
+            r: self.r,
+            g,
+            b: self.b,
+        }
     }
 
     pub const fn with_blue(self, b: T) -> Self {
-        Self(self.0, self.1, b)
+        Self {
+            r: self.r,
+            g: self.g,
+            b,
+        }
     }
 
     pub const fn as_slice(self) -> [T; 3] {
-        [self.0, self.1, self.2]
+        [self.r, self.g, self.b]
     }
 
     pub const fn from_slice(src: [T; 3]) -> Self {
-        Self(src[0], src[1], src[2])
+        Self {
+            r: src[0],
+            g: src[1],
+            b: src[2],
+        }
     }
 
     pub const fn as_tuple(self) -> (T, T, T) {
-        (self.0, self.1, self.2)
+        (self.r, self.g, self.b)
     }
 
     pub const fn from_tuple(src: (T, T, T)) -> Self {
-        Self(src.0, src.1, src.2)
+        Self {
+            r: src.0,
+            g: src.1,
+            b: src.2,
+        }
     }
 
     pub fn map<F: FnOnce(T, T, T) -> [T; 3]>(self, f: F) -> Self {
-        Self::from_slice(f(self.0, self.1, self.2))
+        Self::from_slice(f(self.r, self.g, self.b))
     }
 
     pub const fn red() -> Self {
-        Self(T::MAX, T::MIN, T::MIN)
+        Self {
+            r: T::MAX,
+            g: T::MIN,
+            b: T::MIN,
+        }
     }
 
     pub const fn green() -> Self {
-        Self(T::MIN, T::MAX, T::MIN)
+        Self {
+            r: T::MIN,
+            g: T::MAX,
+            b: T::MIN,
+        }
     }
 
     pub const fn blue() -> Self {
-        Self(T::MIN, T::MIN, T::MAX)
+        Self {
+            r: T::MIN,
+            g: T::MIN,
+            b: T::MAX,
+        }
     }
 
     pub const fn black() -> Self {
-        Self(T::MIN, T::MIN, T::MIN)
+        Self {
+            r: T::MIN,
+            g: T::MIN,
+            b: T::MIN,
+        }
     }
 
     pub const fn white() -> Self {
-        Self(T::MAX, T::MAX, T::MAX)
+        Self {
+            r: T::MAX,
+            g: T::MAX,
+            b: T::MAX,
+        }
     }
 }
 
