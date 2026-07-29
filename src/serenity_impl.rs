@@ -1,16 +1,13 @@
 use serenity::model::Colour;
 
-use crate::{Rgb, RgbCast};
+use crate::{ColourValue, Rgb, RgbCast};
 
-impl Into<Colour> for Rgb<u8> {
-    fn into(self) -> Colour {
-        Colour::from_rgb(self.r, self.g, self.b)
-    }
-}
-
-impl Into<Colour> for Rgb<u32> {
+impl<T: ColourValue> Into<Colour> for Rgb<T>
+where
+    Rgb<T>: RgbCast<u8>,
+{
     fn into(self) -> Colour {
         let o: Rgb<u8> = self.cast();
-        o.into()
+        Colour::from_rgb(o.r, o.g, o.b)
     }
 }

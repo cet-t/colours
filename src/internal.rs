@@ -298,6 +298,23 @@ macro_rules! impl_rgb_cast {
 }
 pub(crate) use impl_rgb_cast;
 
+macro_rules! impl_rgb_cast_identity {
+    ($t:ty) => {
+        impl RgbCast<$t> for Rgb<$t> {
+            fn cast(self) -> Rgb<$t> {
+                self
+            }
+        }
+
+        impl HsvCast<$t> for Hsv<$t> {
+            fn cast(self) -> Hsv<$t> {
+                self
+            }
+        }
+    };
+}
+pub(crate) use impl_rgb_cast_identity;
+
 macro_rules! impl_rgb_cast_f_to_u {
     ($f:ty, $u:ty) => {
         impl RgbCast<$u> for Rgb<$f> {
