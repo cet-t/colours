@@ -6,9 +6,11 @@ edition = "2024"
 [dependencies]
 pastey = "0.2.3"
 serde = { version = "1.0.229", features = ["derive"], optional = true }
+serenity = { version = "0.12.5", optional = true }
 
 [features]
 serde = ["dep:serde"]
+discord = ["dep:serenity"]
 
 [dev-dependencies]
 serde = { version = "1.0.229", features = ["derive"] }
