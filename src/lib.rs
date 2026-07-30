@@ -5,7 +5,7 @@ mod internal;
 mod rgb;
 #[cfg(feature = "serde")]
 mod serde_impl;
-#[cfg(feature = "discord")]
+#[cfg(feature = "serenity")]
 mod serenity_impl;
 #[cfg(test)]
 mod tests;

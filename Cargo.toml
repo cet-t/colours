@@ -10,7 +10,7 @@ serenity = { version = "0.12.5", optional = true }
 
 [features]
 serde = ["dep:serde"]
-discord = ["dep:serenity"]
+serenity = ["dep:serenity"]
 
 [dev-dependencies]
 serde = { version = "1.0.229", features = ["derive"] }
