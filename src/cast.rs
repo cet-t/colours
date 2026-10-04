@@ -1,14 +1,11 @@
-use crate::{
-    ColourValue, Hsv, Rgb, impl_rgb_cast, impl_rgb_cast_f_to_u, impl_rgb_cast_identity,
-    impl_rgb_cast_u_to_f,
-};
+use crate::{impl_rgb_cast, impl_rgb_cast_f_to_u, impl_rgb_cast_identity, impl_rgb_cast_u_to_f};
 
-pub trait RgbCast<T: ColourValue> {
-    fn cast(self) -> Rgb<T>;
+pub trait RgbCast<T: crate::ColourValue> {
+    fn cast(self) -> crate::Rgb<T>;
 }
 
-pub trait HsvCast<T: ColourValue> {
-    fn cast(self) -> Hsv<T>;
+pub trait HsvCast<T: crate::ColourValue> {
+    fn cast(self) -> crate::Hsv<T>;
 }
 
 impl_rgb_cast_identity!(f32);

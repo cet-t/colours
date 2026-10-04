@@ -153,14 +153,14 @@ pub(crate) use impl_colour_trait;
 macro_rules! impl_rgb_to_hsv {
     (u; $($bits:expr),+ $(,)?) => {
         $(::pastey::paste! {
-            impl Into<Hsv<[<u $bits>]>> for Rgb<[<u $bits>]> {
-                fn into(self) -> Hsv<[<u $bits>]> {
+            impl From<Rgb<[<u $bits>]>> for Hsv<[<u $bits>]> {
+                fn from(value: Rgb<[<u $bits>]>) -> Hsv<[<u $bits>]> {
                     const MAX_VAL: f64 = [<u $bits>]::MAX as f64;
                     const UNIT: f64 = MAX_VAL / 6.0;
 
-                    let r = self.r as f64;
-                    let g = self.g as f64;
-                    let b = self.b as f64;
+                    let r = value.r as f64;
+                    let g = value.g as f64;
+                    let b = value.b as f64;
 
                     let c_max = r.max(g.max(b));
                     let c_min = r.min(g.min(b));
@@ -185,13 +185,13 @@ macro_rules! impl_rgb_to_hsv {
     };
     (f; $($bits:expr),+ $(,)?) => {
         $(::pastey::paste! {
-            impl Into<Hsv<[<f $bits>]>> for Rgb<[<f $bits>]> {
-                fn into(self) -> Hsv<[<f $bits>]> {
+            impl From<Rgb<[<f $bits>]>> for Hsv<[<f $bits>]> {
+                fn from(value: Rgb<[<f $bits>]>) -> Hsv<[<f $bits>]> {
                     const UNIT: f64 = 1.0 / 6.0;
 
-                    let r = self.r as f64;
-                    let g = self.g as f64;
-                    let b = self.b as f64;
+                    let r = value.r as f64;
+                    let g = value.g as f64;
+                    let b = value.b as f64;
 
                     let c_max = r.max(g.max(b));
                     let c_min = r.min(g.min(b));
@@ -220,13 +220,13 @@ pub(crate) use impl_rgb_to_hsv;
 macro_rules! impl_hsv_to_rgb {
     (u; $($bits:expr),+ $(,)?) => {
         $(::pastey::paste! {
-            impl Into<Rgb<[<u $bits>]>> for Hsv<[<u $bits>]> {
-                fn into(self) -> Rgb<[<u $bits>]> {
+            impl From<Hsv<[<u $bits>]>> for Rgb<[<u $bits>]>  {
+                fn from(value: Hsv<[<u $bits>]>) -> Rgb<[<u $bits>]> {
                     const MAX_VAL: f64 = [<u $bits>]::MAX as f64;
 
-                    let h = self.h as f64 / MAX_VAL;
-                    let s = self.s as f64 / MAX_VAL;
-                    let v = self.v as f64 / MAX_VAL;
+                    let h = value.h as f64 / MAX_VAL;
+                    let s = value.s as f64 / MAX_VAL;
+                    let v = value.v as f64 / MAX_VAL;
 
                     let h6 = h * 6.0;
                     let c = v * s;
@@ -253,11 +253,11 @@ macro_rules! impl_hsv_to_rgb {
     };
     (f; $($bits:expr),+ $(,)?) => {
         $(::pastey::paste! {
-            impl Into<Rgb<[<f $bits>]>> for Hsv<[<f $bits>]> {
-                fn into(self) -> Rgb<[<f $bits>]> {
-                    let h = self.h as f64;
-                    let s = self.s as f64;
-                    let v = self.v as f64;
+            impl From<Hsv<[<f $bits>]>> for Rgb<[<f $bits>]> {
+                fn from(value: Hsv<[<f $bits>]>) -> Self {
+                    let h = value.h as f64;
+                    let s = value.s as f64;
+                    let v = value.v as f64;
 
                     let h6 = h * 6.0;
                     let c = v * s;
@@ -283,15 +283,15 @@ pub(crate) use impl_hsv_to_rgb;
 
 macro_rules! impl_rgb_cast {
     ($from:ty, $to:ty) => {
-        impl RgbCast<$to> for Rgb<$from> {
-            fn cast(self) -> Rgb<$to> {
-                Rgb::new(self.r as $to, self.g as $to, self.b as $to)
+        impl RgbCast<$to> for $crate::Rgb<$from> {
+            fn cast(self) -> $crate::Rgb<$to> {
+                $crate::Rgb::new(self.r as $to, self.g as $to, self.b as $to)
             }
         }
 
-        impl HsvCast<$to> for Hsv<$from> {
-            fn cast(self) -> Hsv<$to> {
-                Hsv::new(self.h as $to, self.s as $to, self.v as $to)
+        impl HsvCast<$to> for $crate::Hsv<$from> {
+            fn cast(self) -> $crate::Hsv<$to> {
+                $crate::Hsv::new(self.h as $to, self.s as $to, self.v as $to)
             }
         }
     };
@@ -300,14 +300,14 @@ pub(crate) use impl_rgb_cast;
 
 macro_rules! impl_rgb_cast_identity {
     ($t:ty) => {
-        impl RgbCast<$t> for Rgb<$t> {
-            fn cast(self) -> Rgb<$t> {
+        impl RgbCast<$t> for $crate::Rgb<$t> {
+            fn cast(self) -> $crate::Rgb<$t> {
                 self
             }
         }
 
-        impl HsvCast<$t> for Hsv<$t> {
-            fn cast(self) -> Hsv<$t> {
+        impl HsvCast<$t> for $crate::Hsv<$t> {
+            fn cast(self) -> $crate::Hsv<$t> {
                 self
             }
         }
@@ -317,17 +317,17 @@ pub(crate) use impl_rgb_cast_identity;
 
 macro_rules! impl_rgb_cast_f_to_u {
     ($f:ty, $u:ty) => {
-        impl RgbCast<$u> for Rgb<$f> {
-            fn cast(self) -> Rgb<$u> {
+        impl RgbCast<$u> for $crate::Rgb<$f> {
+            fn cast(self) -> $crate::Rgb<$u> {
                 let to_u = |x| (x * 255.0) as $u;
-                Rgb::new(to_u(self.r), to_u(self.g), to_u(self.b))
+                $crate::Rgb::new(to_u(self.r), to_u(self.g), to_u(self.b))
             }
         }
 
-        impl HsvCast<$u> for Hsv<$f> {
-            fn cast(self) -> Hsv<$u> {
+        impl HsvCast<$u> for $crate::Hsv<$f> {
+            fn cast(self) -> $crate::Hsv<$u> {
                 let to_u = |x| (x * 255.0) as $u;
-                Hsv::new(to_u(self.h), to_u(self.s), to_u(self.v))
+                $crate::Hsv::new(to_u(self.h), to_u(self.s), to_u(self.v))
             }
         }
     };
@@ -336,17 +336,17 @@ pub(crate) use impl_rgb_cast_f_to_u;
 
 macro_rules! impl_rgb_cast_u_to_f {
     ($u:ty, $f:ty) => {
-        impl RgbCast<$f> for Rgb<$u> {
-            fn cast(self) -> Rgb<$f> {
+        impl RgbCast<$f> for $crate::Rgb<$u> {
+            fn cast(self) -> $crate::Rgb<$f> {
                 let to_f = |x| (x as $f) / 255.0;
-                Rgb::new(to_f(self.r), to_f(self.g), to_f(self.b))
+                $crate::Rgb::new(to_f(self.r), to_f(self.g), to_f(self.b))
             }
         }
 
-        impl HsvCast<$f> for Hsv<$u> {
-            fn cast(self) -> Hsv<$f> {
+        impl HsvCast<$f> for $crate::Hsv<$u> {
+            fn cast(self) -> $crate::Hsv<$f> {
                 let to_f = |x| (x as $f) / 255.0;
-                Hsv::new(to_f(self.h), to_f(self.s), to_f(self.v))
+                $crate::Hsv::new(to_f(self.h), to_f(self.s), to_f(self.v))
             }
         }
     };
